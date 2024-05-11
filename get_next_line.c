@@ -6,7 +6,7 @@
 /*   By: yotsurud <yotsurud@student.42tokyo.>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/02 12:46:06 by yotsurud          #+#    #+#             */
-/*   Updated: 2024/05/02 18:19:16 by yotsurud         ###   ########.fr       */
+/*   Updated: 2024/05/11 11:38:56 by yotsurud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,12 +24,9 @@ char	*ft_strjoin(char *s1, char c, int len)
 	string = (char *)malloc(sizeof(char) * len);
 	if (!string)
 		return (free(s1), NULL);
-	i = 0;
-	while (i < len - 2)
-	{
+	i = -1;
+	while (++i < len - 2)
 		string[i] = s1[i];
-		i++;
-	}
 	string[i] = c;
 	string[++i] = '\0';
 	free(s1);
@@ -51,7 +48,8 @@ static char	ft_getchar(int fd)
 	}
 	if (--read_byte >= 0)
 		return ((char)*(ptr++));
-	return (EOF);
+	else
+		return (EOF);
 }
 
 char	*get_next_line(int fd)
