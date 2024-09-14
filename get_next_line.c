@@ -1,39 +1,38 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   get_next_line.c                                    :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: yotsurud <yotsurud@student.42tokyo.>       +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/05/02 12:46:06 by yotsurud          #+#    #+#             */
-/*   Updated: 2024/05/11 11:38:56 by yotsurud         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include "get_next_line.h"
 
 char	*ft_strjoin(char *s1, char c, int len)
 {
-	char	*string;
-	int		i;
+	char	*result;
+	int	i;
 
-	i = 0;
 	if (!s1 && !c)
 		return (NULL);
-	string = NULL;
-	string = (char *)malloc(sizeof(char) * len);
-	if (!string)
+	result = NULL;
+	result = (char *)malloc(sizeof(char) * len);
+	if (!result)
 		return (free(s1), NULL);
 	i = -1;
 	while (++i < len - 2)
-		string[i] = s1[i];
-	string[i] = c;
-	string[++i] = '\0';
+		result[i] = s1[i];
+	result[i] = c;
+	result[++i] = '\0';
 	free(s1);
-	return (string);
+	return (result);
 }
 
-static char	ft_getchar(int fd)
+void	buf_zero(char *buf, char *ptr, int *read_byte)
+{
+	int	i;
+
+	i = -1;
+	while (++i < BUFFER_SIZE)
+		buf[i] = 0;
+	*ptr = 0;
+	ptr = NULL;
+	*read_byte = 0;
+}
+
+char	get_char(int fd)
 {
 	static char	buf[BUFFER_SIZE];
 	static char	*ptr;
@@ -43,20 +42,19 @@ static char	ft_getchar(int fd)
 	{
 		read_byte = read(fd, buf, BUFFER_SIZE);
 		if (read_byte < 0)
-			return (FALSE);
+			return (buf_zero(buf, ptr, &read_byte), FAIL);
 		ptr = buf;
 	}
 	if (--read_byte >= 0)
-		return ((char)*(ptr++));
-	else
-		return (EOF);
+		return ((char) * (ptr++));
+	return (buf_zero(buf, ptr, &read_byte), EOF);
 }
 
 char	*get_next_line(int fd)
 {
 	char	*result;
 	char	c;
-	int		len;
+	int	len;
 
 	if (fd == -1)
 		return (NULL);
@@ -65,8 +63,8 @@ char	*get_next_line(int fd)
 	len = 2;
 	while (1)
 	{
-		c = ft_getchar(fd);
-		if (c == FALSE)
+		c = get_char(fd);
+		if (c == FAIL)
 			return (free(result), NULL);
 		if (c == EOF)
 			break ;
@@ -77,25 +75,19 @@ char	*get_next_line(int fd)
 	}
 	return (result);
 }
+/*
+int	main(void)
+{
+	char	*result;
 
-// __attribute__((destructor)) static void destructor()
-// {
-//     system("leaks -q a.out");
-// }
-
-//  int	main()
-// {
-//  	int		fd;
-//  	char	*result;
-
-//  	fd = open("test.txt", O_RDONLY);
-//  	while(1)
-//  	{
-//  		result = get_next_line(fd);
-//  		if (!result)
-//  			break ;
-//  		printf("%s", result);
-//  		free(result);
-//  	}
-//  	close(fd);
-// }
+	while (1)
+	{
+		result = NULL;
+		result = get_next_line(0);
+		if (!result)
+			break;
+		printf("%s", result);
+		free(result);
+	}
+}
+*/
